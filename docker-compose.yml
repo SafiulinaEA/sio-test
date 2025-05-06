@@ -1,0 +1,44 @@
+services:
+    sio_test:
+        user: app
+        build:
+            context: ../backend-test-task
+            dockerfile: Dockerfile
+            args:
+                USER_ID: ${USER_ID:-1000}
+        container_name: sio_app
+        ports:
+            - "8337:8337"
+        volumes:
+            - .:/app:rw
+        depends_on:
+            db:
+                condition: service_healthy
+        environment:
+            - APP_ENV=dev
+        networks:
+            - app_network
+
+    db:
+        image: postgres:14
+        container_name: sio_db
+        environment:
+            POSTGRES_USER: sio_user
+            POSTGRES_PASSWORD: sio_password
+            POSTGRES_DB: sio_db
+        volumes:
+            - db_data:/var/lib/postgresql/data
+        healthcheck:
+            test: ["CMD-SHELL", "pg_isready -U sio_user -d sio_db"]
+            interval: 5s
+            timeout: 5s
+            retries: 10
+        networks:
+            - app_network
+
+volumes:
+    db_data:
+
+networks:
+    app_network:
+        driver: bridge
