@@ -2,7 +2,7 @@ services:
     sio_test:
         user: app
         build:
-            context: ../backend-test-task
+            context: .
             dockerfile: Dockerfile
             args:
                 USER_ID: ${USER_ID:-1000}

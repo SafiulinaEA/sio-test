@@ -94,17 +94,26 @@ CRUD для сущностей предполагается уже реализ�
 - Показать способность избегать сложных подходов вроде onion-based/DDD/CQS/гексагональной архитектуры в пользу корректности и полноты решения.
 
 **Requirements**
+
 •	Docker Desktop
 
 **Starting Docker containers**
-`docker compose up -d --build`
+```
+docker compose up -d --build
+```
 
 **Install dependencies**
-`docker compose exec sio_test composer install`
+```
+docker compose exec sio_test composer install
+```
 
 **Create and migrate the database**
-`docker compose exec sio_test bin/console doctrine:database:create
-docker compose exec sio_test bin/console doctrine:migrations:migrate`
+```
+docker compose exec sio_test bin/console doctrine:database:create
+docker compose exec sio_test bin/console doctrine:migrations:migrate
+```
 
 **Loading test data**
-`docker compose exec sio_test bin/console doctrine:fixtures:load`
+```
+docker compose exec sio_test bin/console doctrine:fixtures:load
+```

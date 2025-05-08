@@ -35,7 +35,7 @@ class /**/Product
         return $this;
     }
 
-    public function getPrice(): float
+    public function getPrice(): int
     {
         return $this->price;
     }
