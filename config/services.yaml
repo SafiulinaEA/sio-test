@@ -26,6 +26,7 @@ services:
         resource: '../src/Controller'
         tags: [ 'controller.service_arguments' ]
 
+    #Tax Calculator
     App\Tax\:
         resource: '../src/Tax'
         tags: [ 'app.tax_calculator' ]
@@ -34,3 +35,13 @@ services:
         arguments:
            $calculators: !tagged_iterator app.tax_calculator
 
+    #Payment Processor
+    App\Payment\PaypalProcessorAdapter:
+        tags: ['payment.processor']
+
+    App\Payment\StripeProcessorAdapter:
+        tags: ['payment.processor']
+
+    App\Payment\PaymentProcessorResolver:
+        arguments:
+            $processors: !tagged_iterator payment.processor

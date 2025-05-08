@@ -2,9 +2,14 @@
 
 namespace App\Service;
 
+use App\DTO\CalculatePriceRequest;
+use App\DTO\PurchaseRequest;
+use App\Entity\Product;
+use App\Entity\Coupon;
 use App\Repository\ProductRepository;
 use App\Repository\CouponRepository;
 use App\Tax\TaxCalculatorResolver;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 class PriceCalculatorService
 {
@@ -14,28 +19,33 @@ class PriceCalculatorService
             private TaxCalculatorResolver $taxResolver
     ) {}
 
-    public function calculate(array $productIds, ?string $couponCode, string $taxNumber): int
+    /**
+     * @param CalculatePriceRequest|PurchaseRequest $dto
+     */
+    public function calculate($dto): int
     {
-        $products = $this->productRepo->findBy(['id' => $productIds]);
-        $price = array_reduce($products, fn($carry, $product) => $carry + $product->getPrice(), 0);
+        $product = $this->productRepo->find($dto->product);
+        if (!$product) {
+            throw new BadRequestHttpException('Product not found.');
+        }
 
-        if ($couponCode !== null) {
-            $coupon = $this->couponRepo->findOneBy(['code' => $couponCode]);
+        $price = $product->getPrice(); // Price in cents
+
+        if (!empty($dto->couponCode)) {
+            $coupon = $this->couponRepo->findOneBy(['code' => $dto->couponCode]);
 
             if (!$coupon) {
-                throw new \InvalidArgumentException('Coupon not found.');
+                throw new BadRequestHttpException('The coupon does not exist.');
             }
 
             $price = match ($coupon->getType()) {
-                'percent' => $price - intval(round($price * $coupon->getValue() / 100)),
-                'fixed'   => max(0, $price - $coupon->getValue()),
-                default   => throw new \RuntimeException('Unknown coupon type.'),
+                'percent' => (int) round($price * (1 - $coupon->getValue() / 100)),
+                'fixed'   => max(0, $price - (int) $coupon->getValue()),
+                default   => $price,
             };
         }
 
-        $taxCalculator = $this->taxResolver->resolve($taxNumber);
-        $tax = intval(round($taxCalculator->calculate($price)));
-
-        return $price + $tax;
+        $taxCalculator = $this->taxResolver->resolve($dto->taxNumber);
+        return $taxCalculator->calculateWithTax($price);
     }
 }

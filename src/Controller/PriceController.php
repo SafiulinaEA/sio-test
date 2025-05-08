@@ -12,6 +12,7 @@ use App\DTO\CalculatePriceRequest;
 use App\DTO\PurchaseRequest;
 use App\Service\PriceCalculatorService;
 use App\Service\PurchaseService;
+use App\Payment\PaymentProcessorResolver;
 
 
 class PriceController extends AbstractController
@@ -23,57 +24,48 @@ class PriceController extends AbstractController
             SerializerInterface $serializer,
             PriceCalculatorService $calculator
     ): JsonResponse {
-
-//        $dto = $serializer->deserialize($request->getContent(), CalculatePriceRequest::class, 'json');
-//        $errors = $validator->validate($dto);
-//
-//        if (count($errors) > 0) {
-//            return new JsonResponse(['errors' => (string) $errors], 400);
-//        }
-//
-//        $total = $calculator->calculate($dto->products, $dto->coupon);
-//        return new JsonResponse(['total' => $total]);
-
-        $data = json_decode($request->getContent(), true);
-
-        $dto = new CalculatePriceRequest($data);
+        $dto = $serializer->deserialize($request->getContent(), CalculatePriceRequest::class, 'json');
         $errors = $validator->validate($dto);
 
         if (count($errors) > 0) {
-            return $this->json(['errors' => (string)$errors], 400);
+            $errorMessages = [];
+            foreach ($errors as $error) {
+                $errorMessages[] = $error->getPropertyPath() . ': ' . $error->getMessage();
+            }
+
+            return $this->json(['errors' => $errorMessages], 422);
         }
 
         $price = $calculator->calculate($dto);
 
-        return $this->json(['price' => $price]);
+        return $this->json(['price' => $price], 200);
     }
 
     #[Route('/purchase', name: 'purchase', methods: ['POST'])]
     public function purchase(
             Request $request,
+            SerializerInterface $serializer,
             ValidatorInterface $validator,
             PriceCalculatorService $calculator,
             PaymentProcessorResolver $processorResolver
     ): JsonResponse {
-        $data = json_decode($request->getContent(), true);
-        $dto = new PurchaseRequest();
-        $dto->products = $data['products'] ?? [];
-        $dto->taxNumber = $data['taxNumber'] ?? '';
-        $dto->paymentProcessor = $data['paymentProcessor'] ?? '';
-        $dto->coupon = $data['coupon'] ?? null;
-
+        $dto = $serializer->deserialize($request->getContent(), PurchaseRequest::class, 'json');
         $errors = $validator->validate($dto);
+
         if (count($errors) > 0) {
-            return $this->json(['errors' => (string) $errors], 400);
+            $errorMessages = [];
+            foreach ($errors as $error) {
+                $errorMessages[] = $error->getPropertyPath() . ': ' . $error->getMessage();
+            }
+
+            return $this->json(['errors' => $errorMessages], 422);
         }
 
-        $amount = $calculator->calculate($dto->products, $dto->coupon, $dto->taxNumber);
+        $price = $calculator->calculate($dto);
+
         $processor = $processorResolver->resolve($dto->paymentProcessor);
+        $processor->pay($price);
 
-        if (!$processor->pay($amount)) {
-            return $this->json(['status' => 'fail', 'message' => 'Платёж не прошёл'], 500);
-        }
-
-        return $this->json(['status' => 'success', 'amount' => $amount]);
+        return $this->json(['status' => 'success', 'price' => $price], 200);
     }
 }

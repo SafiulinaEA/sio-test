@@ -11,9 +11,9 @@ class PurchaseService
             private PriceCalculatorService $priceCalculator
     ) {}
 
-    public function purchase(array $products, ?string $coupon, string $taxNumber, string $processor): string
+    public function purchase(int $product, ?string $coupon, string $taxNumber, string $processor): string
     {
-        $total = $this->priceCalculator->calculate($products, $coupon, $taxNumber);
+        $total = $this->priceCalculator->calculate($product, $coupon, $taxNumber);
 
         return match($processor) {
             'paypal' => (new PaypalPaymentProcessor())->pay($total),

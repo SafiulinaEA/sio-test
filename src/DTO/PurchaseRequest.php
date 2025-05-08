@@ -7,8 +7,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 class PurchaseRequest
 {
     #[Assert\NotBlank]
-    #[Assert\Type('array')]
-    public array $products;
+    #[Assert\Type('integer')]
+    public int $product;
 
     #[Assert\NotBlank]
     #[Assert\Regex(
