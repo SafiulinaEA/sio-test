@@ -17,5 +17,5 @@ class CalculatePriceRequest
     public string $taxNumber;
 
     #[Assert\Type('string')]
-    public ?string $coupon = null;
+    public ?string $couponCode = null;
 }

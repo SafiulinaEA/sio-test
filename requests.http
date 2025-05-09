@@ -1,4 +1,4 @@
-### Calculate Price
+### ✅ Calculate Price (with valid coupon and tax number)
 POST http://127.0.0.1:8337/calculate-price
 Accept: application/json
 Content-Type: application/json
@@ -9,7 +9,7 @@ Content-Type: application/json
   "couponCode": "D15"
 }
 
-### Execute Purchase
+### ✅ Execute Purchase (with valid input)
 POST http://127.0.0.1:8337/purchase
 Accept: application/json
 Content-Type: application/json
@@ -19,4 +19,49 @@ Content-Type: application/json
   "taxNumber": "IT12345678900",
   "couponCode": "D15",
   "paymentProcessor": "paypal"
+}
+
+### ❌ Calculate Price (non-existing product)
+POST http://127.0.0.1:8337/calculate-price
+Accept: application/json
+Content-Type: application/json
+
+{
+  "product": 999,
+  "taxNumber": "DE123456789"
+}
+
+### ❌ Calculate Price (invalid tax number format)
+POST http://127.0.0.1:8337/calculate-price
+Accept: application/json
+Content-Type: application/json
+
+{
+  "product": 1,
+  "taxNumber": "INVALID",
+  "couponCode": "P10"
+}
+
+### ❌ Execute Purchase (invalid payment processor)
+POST http://127.0.0.1:8337/purchase
+Accept: application/json
+Content-Type: application/json
+
+{
+  "product": 1,
+  "taxNumber": "IT12345678900",
+  "couponCode": "D15",
+  "paymentProcessor": "unknown_processor"
+}
+
+### ❌ Execute Purchase (invalid coupon code)
+POST http://127.0.0.1:8337/purchase
+Accept: application/json
+Content-Type: application/json
+
+{
+  "product": 1,
+  "taxNumber": "DE123456789",
+  "couponCode": "INVALIDCODE",
+  "paymentProcessor": "stripe"
 }

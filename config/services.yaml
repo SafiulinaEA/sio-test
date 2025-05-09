@@ -45,3 +45,6 @@ services:
     App\Payment\PaymentProcessorResolver:
         arguments:
             $processors: !tagged_iterator payment.processor
+
+    Systemeio\TestForCandidates\PaymentProcessor\PaypalPaymentProcessor: ~
+    Systemeio\TestForCandidates\PaymentProcessor\StripePaymentProcessor: ~

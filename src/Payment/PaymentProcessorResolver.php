@@ -17,6 +17,6 @@ class PaymentProcessorResolver
             }
         }
 
-        throw new \InvalidArgumentException("Платёжный процессор '$name' не поддерживается.");
+        throw new \InvalidArgumentException("Unsupported payment processor: $name. ");
     }
 }

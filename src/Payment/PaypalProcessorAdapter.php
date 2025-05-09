@@ -6,7 +6,9 @@ use Systemeio\TestForCandidates\PaymentProcessor\PaypalPaymentProcessor;
 
 class PaypalProcessorAdapter implements PaymentProcessorInterface
 {
-    public function __construct(private PaypalPaymentProcessor $processor) {}
+    public function __construct(
+            private readonly PaypalPaymentProcessor $processor
+    ) {}
 
     public function supports(string $name): bool
     {

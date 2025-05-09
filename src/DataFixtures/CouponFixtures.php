@@ -19,8 +19,8 @@ class CouponFixtures extends Fixture
         foreach ($coupons as [$code, $value, $type]) {
             $coupon = new Coupon();
             $coupon->setCode($code);
-            $coupon->setValue($value);
-            $coupon->setType($type);
+            $coupon->setDiscountValue($value);
+            $coupon->setDiscountType($type);
             $manager->persist($coupon);
         }
 

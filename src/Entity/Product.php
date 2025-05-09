@@ -6,7 +6,7 @@ use App\Repository\ProductRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ProductRepository::class)]
-class /**/Product
+class Product
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -21,7 +21,7 @@ class /**/Product
 
     public function getId(): ?int
     {
-        return $id;
+        return $this->id;
     }
 
     public function getName(): string
@@ -42,7 +42,7 @@ class /**/Product
 
     public function setPrice(float $price): self
     {
-        $this->price = $price;
+        $this->price = (int) $price;
         return $this;
     }
 }

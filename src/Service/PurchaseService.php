@@ -2,23 +2,21 @@
 
 namespace App\Service;
 
-use Systemeio\TestForCandidates\PaymentProcessor\PaypalPaymentProcessor;
-use Systemeio\TestForCandidates\PaymentProcessor\StripePaymentProcessor;
+use App\Payment\PaymentProcessorResolver;
 
 class PurchaseService
 {
     public function __construct(
-            private PriceCalculatorService $priceCalculator
+            private PriceCalculatorService $priceCalculator,
+            private PaymentProcessorResolver $resolver
     ) {}
 
-    public function purchase(int $product, ?string $coupon, string $taxNumber, string $processor): string
+    public function purchase(int $product, ?string $couponCode, string $taxNumber, string $processorName): bool
     {
-        $total = $this->priceCalculator->calculate($product, $coupon, $taxNumber);
+        $total = $this->priceCalculator->calculate($product, $couponCode, $taxNumber);
 
-        return match($processor) {
-            'paypal' => (new PaypalPaymentProcessor())->pay($total),
-            'stripe' => (new StripePaymentProcessor())->processPayment($total),
-            default => throw new \InvalidArgumentException('Unsupported processor.')
-        };
+        $processor = $this->resolver->resolve($processorName);
+
+        return $processor->pay($total);
     }
 }

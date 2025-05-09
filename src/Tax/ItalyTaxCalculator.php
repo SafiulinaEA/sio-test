@@ -9,8 +9,8 @@ class ItalyTaxCalculator implements TaxCalculatorInterface
         return preg_match('/^IT\d{11}$/', $taxNumber);
     }
 
-    public function calculate(float $price): int
+    public function calculateWithTax(int $price): int
     {
-        return $price * 0.22;
+        return intdiv($price * 122, 100);
     }
 }

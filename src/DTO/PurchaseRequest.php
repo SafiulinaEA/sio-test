@@ -21,5 +21,5 @@ class PurchaseRequest
     public string $paymentProcessor;
 
     #[Assert\Type('string')]
-    public ?string $coupon = null;
+    public ?string $couponCode = null;
 }

@@ -13,3 +13,8 @@ compose.override.yaml
 ###< symfony/framework-bundle ###
 /.env
 /composer.lock
+
+###> phpunit/phpunit ###
+/phpunit.xml
+/.phpunit.cache/
+###< phpunit/phpunit ###

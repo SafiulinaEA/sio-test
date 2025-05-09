@@ -1,6 +1,5 @@
 <?php
 
-
 namespace App\Tax;
 
 class GreeceTaxCalculator implements TaxCalculatorInterface
@@ -10,8 +9,8 @@ class GreeceTaxCalculator implements TaxCalculatorInterface
         return preg_match('/^GR\d{9}$/', $taxNumber);
     }
 
-    public function calculate(float $price): int
+    public function calculateWithTax(int $price): int
     {
-        return $price * 0.24;
+        return intdiv($price * 124, 100);
     }
 }

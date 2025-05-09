@@ -31,16 +31,18 @@ class PriceCalculatorService
 
         $price = $product->getPrice(); // Price in cents
 
-        if (!empty($dto->couponCode)) {
-            $coupon = $this->couponRepo->findOneBy(['code' => $dto->couponCode]);
+        $couponCode = $dto->couponCode ?? null;
+
+        if (!empty($couponCode)) {
+            $coupon = $this->couponRepo->findOneBy(['code' => $couponCode]);
 
             if (!$coupon) {
                 throw new BadRequestHttpException('The coupon does not exist.');
             }
 
-            $price = match ($coupon->getType()) {
-                'percent' => (int) round($price * (1 - $coupon->getValue() / 100)),
-                'fixed'   => max(0, $price - (int) $coupon->getValue()),
+            $price = match ($coupon->getDiscountType()) {
+                'percent' => (int) round($price * (1 - $coupon->getDiscountValue() / 100)),
+                'fixed'   => max(0, $price - (int) $coupon->getDiscountValue()),
                 default   => $price,
             };
         }

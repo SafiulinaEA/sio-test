@@ -9,8 +9,8 @@ class FranceTaxCalculator implements TaxCalculatorInterface
         return preg_match('/^FR[A-Z]{2}\d{9}$/', $taxNumber);
     }
 
-    public function calculate(float $price): int
+    public function calculateWithTax(int $price): int
     {
-        return $price * 0.20;
+        return intdiv($price * 120, 100);
     }
 }

@@ -9,8 +9,8 @@ class GermanyTaxCalculator implements TaxCalculatorInterface
         return preg_match('/^DE\d{9}$/', $taxNumber);
     }
 
-    public function calculate(float $price): int
+    public function calculateWithTax(int $price): int
     {
-        return $price * 0.19;
+        return intdiv($price * 119, 100);
     }
 }
